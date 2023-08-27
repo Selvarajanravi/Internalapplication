@@ -1,17 +1,14 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
-// import Layout from "../components/Layout";
 function Dashboard() {
 	const navigate = useNavigate();
 	const [user, setUser] = useState({});
+	const [cookies, setCookie, removeCookie] = useCookies(["token"]);
 
 	useEffect(() => {
-		if (localStorage.getItem("token") == "" || localStorage.getItem("token") == null) {
-			navigate("/");
-		} else {
-			getUser();
-		}
+		getUser();
 	}, []);
 
 	const getUser = () => {
@@ -25,16 +22,21 @@ function Dashboard() {
 			});
 	};
 
-	const logoutAction = () => {
-		axios
-			.post("/api/logout", {}, { headers: { Authorization: "Bearer " + localStorage.getItem("token") } })
-			.then((r) => {
-				localStorage.setItem("token", "");
-				navigate("/");
-			})
-			.catch((e) => {
-				console.log(e);
-			});
+	// const logoutAction = () => {
+	// 	axios
+	// 		.post("/api/logout", {}, { headers: { Authorization: "Bearer " + localStorage.getItem("token") } })
+	// 		.then((r) => {
+	// 			localStorage.setItem("token", "");
+	// 			navigate("/");
+	// 		})
+	// 		.catch((e) => {
+	// 			console.log(e);
+	// 		});
+	// };
+	const logoutHandler = (e) => {
+		e.preventDefault();
+		removeCookie("token");
+		navigate("/");
 	};
 
 	return (
@@ -49,12 +51,7 @@ function Dashboard() {
 							<div className="d-flex">
 								<ul className="navbar-nav">
 									<li className="nav-item">
-										<a
-											onClick={() => logoutAction()}
-											className="nav-link "
-											aria-current="page"
-											href="#"
-										>
+										<a onClick={logoutHandler} className="nav-link " aria-current="page" href="#">
 											Logout
 										</a>
 									</li>
