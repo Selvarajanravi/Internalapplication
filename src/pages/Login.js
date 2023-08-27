@@ -1,7 +1,9 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 // import Layout from "../components/Layout";
+import { useCookies } from "react-cookie";
+import "react-toastify/dist/ReactToastify.css";
+import { adminLogin } from "../services/admin";
 
 function Login() {
 	const navigate = useNavigate();
@@ -9,41 +11,33 @@ function Login() {
 	const [password, setPassword] = useState("");
 	const [validationErrors, setValidationErrors] = useState({});
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const headers = {
-		"Content-Type": "application/json",
-		"Access-Control-Allow-Origin": "*"
-	};
+	const [cookies, setCookie] = useCookies(["token"]);
 
-	useEffect(() => {
-		if (localStorage.getItem("token") != "" && localStorage.getItem("token") != null) {
-			navigate("/dashboard");
-		}
-		console.log(localStorage.getItem("token"));
-	}, []);
-
-	const loginAction = (e) => {
-		setValidationErrors({});
+	const loginHandler = (e) => {
 		e.preventDefault();
+		setValidationErrors({});
 		setIsSubmitting(true);
 		let payload = {
 			email: email,
 			password: password
 		};
-		axios
-			.post("https://technorucswalkinapi.azurewebsites.net" + "/api/Admin/AdminLogin", payload, { headers })
+		adminLogin(payload)
 			.then((r) => {
-				setIsSubmitting(false);
-				localStorage.setItem("token", r.data.token);
-				navigate("/dashboard");
+				setCookie("token", r.data.token);
+				navigate("/");
 			})
 			.catch((e) => {
+				// setIsSubmitting(false);
+				// if (e.response.data.errors != undefined) {
+				// 	setValidationErrors(e.response.data.errors);
+				// }
+				// if (e.response.data.error != undefined) {
+				// 	setValidationErrors(e.response.data.error);
+				// }
+				alert("you don't have access");
+			})
+			.finally(() => {
 				setIsSubmitting(false);
-				if (e.response.data.errors != undefined) {
-					setValidationErrors(e.response.data.errors);
-				}
-				if (e.response.data.error != undefined) {
-					setValidationErrors(e.response.data.error);
-				}
 			});
 	};
 
@@ -54,11 +48,7 @@ function Login() {
 					<div className="card">
 						<div className="card-body">
 							<h5 className="card-title mb-4">Sign In</h5>
-							<form
-								onSubmit={(e) => {
-									loginAction(e);
-								}}
-							>
+							<form onSubmit={loginHandler}>
 								{Object.keys(validationErrors).length != 0 && (
 									<p className="text-center ">
 										<small className="text-danger">Incorrect Email or Password</small>
@@ -66,7 +56,6 @@ function Login() {
 								)}
 
 								<div className="mb-3">
-									<p>HI</p>
 									<label htmlFor="email" className="form-label">
 										Email address
 									</label>
@@ -76,6 +65,7 @@ function Login() {
 										id="email"
 										name="email"
 										value={email}
+										required
 										onChange={(e) => {
 											setEmail(e.target.value);
 										}}
@@ -91,6 +81,7 @@ function Login() {
 										id="password"
 										name="password"
 										value={password}
+										required
 										onChange={(e) => {
 											setPassword(e.target.value);
 										}}
