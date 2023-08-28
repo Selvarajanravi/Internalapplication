@@ -79,9 +79,9 @@ function Register() {
 	};
 
 	return (
-		<>
+		<div className="container">
 			<div className="row justify-content-md-center mt-5">
-				<div className="col-4">
+				<div className="col-5">
 					<div className="card">
 						<div className="card-body">
 							<h5 className="card-title mb-4">Register</h5>
@@ -173,7 +173,7 @@ function Register() {
 					</div>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 }
 
