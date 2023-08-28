@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useCookies } from "react-cookie";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { adminLogin } from "../services/admin";
 
@@ -33,7 +34,7 @@ function Login() {
 				// if (e.response.data.error != undefined) {
 				// 	setValidationErrors(e.response.data.error);
 				// }
-				alert("you don't have access");
+				toast.warning("you don't have access");
 			})
 			.finally(() => {
 				setIsSubmitting(false);
