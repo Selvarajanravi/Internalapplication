@@ -1,7 +1,8 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useCookies } from "react-cookie";
 import { Link, useNavigate } from "react-router-dom";
-// import Layout from "../components/Layout";
+import { createAdminUser } from "../services/admin";
+
 function Register() {
 	const navigate = useNavigate();
 	const [name, setName] = useState("");
@@ -10,24 +11,9 @@ function Register() {
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [validationErrors, setValidationErrors] = useState({});
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	// const RegisterConfig = {
-	// 	headers: {
-	// 		ContentType: "application / json",
-	// 		"Access-Control-Allow-Origin": "*"
-	// 	}
-	// };
-	const headers = {
-		"Content-Type": "application/json",
-		"Access-Control-Allow-Origin": "*"
-	};
+	const [cookies, setCookie] = useCookies(["token"]);
 
-	useEffect(() => {
-		if (localStorage.getItem("token") != "" && localStorage.getItem("token") != null) {
-			navigate("/dashboard");
-		}
-	}, []);
-
-	const registerAction = (e) => {
+	const registerHandler = (e) => {
 		e.preventDefault();
 		setIsSubmitting(true);
 		let payload = {
@@ -36,14 +22,11 @@ function Register() {
 			password: password,
 			password_confirmation: confirmPassword
 		};
-		axios
-			.post("https://technorucswalkinapi.azurewebsites.net" + "/api/Admin/CreateAdminUser", payload, { headers })
+		createAdminUser(payload)
 			.then((r) => {
-				setIsSubmitting(false);
-				console.log(r);
-				localStorage.setItem("token", r.data.token);
-				navigate("/dashboard");
-				console.log(r.data);
+				setCookie("token", r.data.token);
+				navigate("/login");
+				alert("Successfully registered");
 			})
 			.catch((e) => {
 				console.log(e);
@@ -51,6 +34,10 @@ function Register() {
 				if (e.response.data.errors != undefined) {
 					setValidationErrors(e.response.data.errors);
 				}
+				alert("User already exist");
+			})
+			.finally(() => {
+				setIsSubmitting(false);
 			});
 	};
 
@@ -61,7 +48,7 @@ function Register() {
 					<div className="card">
 						<div className="card-body">
 							<h5 className="card-title mb-4">Register</h5>
-							<form onSubmit={(e) => registerAction(e)}>
+							<form onSubmit={registerHandler} autoComplete="off">
 								<div className="mb-3">
 									<label htmlFor="name" className="form-label">
 										Name
@@ -132,6 +119,11 @@ function Register() {
 										value={confirmPassword}
 										onChange={(e) => setConfirmPassword(e.target.value)}
 									/>
+									{password !== confirmPassword && (
+										<div className="flex flex-col">
+											<small className="text-danger">Passwords do not match</small>
+										</div>
+									)}
 								</div>
 								<div className="d-grid gap-2">
 									<button disabled={isSubmitting} type="submit" className="btn btn-primary btn-block">
