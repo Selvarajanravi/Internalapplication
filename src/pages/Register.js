@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useCookies } from "react-cookie";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { createAdminUser } from "../services/admin";
 
 function Register() {
@@ -11,7 +12,6 @@ function Register() {
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [validationErrors, setValidationErrors] = useState({});
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [cookies, setCookie] = useCookies(["token"]);
 
 	const registerHandler = (e) => {
 		e.preventDefault();
@@ -19,22 +19,18 @@ function Register() {
 		let payload = {
 			name: name,
 			email: email,
-			password: password,
-			password_confirmation: confirmPassword
+			password: password
 		};
 		createAdminUser(payload)
 			.then((r) => {
-				setCookie("token", r.data.token);
 				navigate("/login");
-				alert("Successfully registered");
+				toast.success("Successfully registered");
 			})
 			.catch((e) => {
 				console.log(e);
-				setIsSubmitting(false);
-				if (e.response.data.errors != undefined) {
-					setValidationErrors(e.response.data.errors);
+				if (e.response?.data?.status) {
+					toast.error(e.response.data.status);
 				}
-				alert("User already exist");
 			})
 			.finally(() => {
 				setIsSubmitting(false);
@@ -130,7 +126,7 @@ function Register() {
 										Register Now
 									</button>
 									<p className="text-center">
-										Have already an account <Link to="/">Login here</Link>
+										Have already an account <Link to="/login">Login here</Link>
 									</p>
 								</div>
 							</form>
