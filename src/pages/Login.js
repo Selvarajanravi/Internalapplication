@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-// import Layout from "../components/Layout";
 import { useCookies } from "react-cookie";
+import { Link, useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import { adminLogin } from "../services/admin";
 
@@ -48,7 +47,7 @@ function Login() {
 					<div className="card">
 						<div className="card-body">
 							<h5 className="card-title mb-4">Sign In</h5>
-							<form onSubmit={loginHandler}>
+							<form onSubmit={loginHandler} autoComplete="off">
 								{Object.keys(validationErrors).length != 0 && (
 									<p className="text-center ">
 										<small className="text-danger">Incorrect Email or Password</small>
