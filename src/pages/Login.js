@@ -113,7 +113,7 @@ function Login() {
 								<button
 									onClick={loginHandler}
 									disabled={isSubmitting}
-									className="btn btn-primary btn-block"
+									className={`btn btn-${isSubmitting ? "secondary" : "primary"} btn-block`}
 								>
 									Login
 								</button>
